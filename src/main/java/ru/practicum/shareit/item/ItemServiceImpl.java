@@ -21,7 +21,10 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private Long id = 1L;
 
-    public ItemServiceImpl(ItemRepository repository, UserService userService, UserMapper userMapper, ItemMapper itemMapper) {
+    public ItemServiceImpl(ItemRepository repository,
+                           UserService userService,
+                           UserMapper userMapper,
+                           ItemMapper itemMapper) {
         this.repository = repository;
         this.userService = userService;
         this.userMapper = userMapper;
@@ -46,8 +49,8 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemMapper.fromDto(itemDto);
         item.setId(itemId);
         item.getOwner().setId(userId);
-        for (Item i : repository.getItemsByOwner(item.getOwner().getId())) {
-            if (i.getId().equals(item.getId())) {
+        for (Item ownerItem : repository.getItemsByOwner(item.getOwner().getId())) {
+            if (ownerItem.getId().equals(item.getId())) {
                 Item updatedItem = repository.getItemById(item.getId());
                 if (item.getName() != null) {
                     updatedItem.setName(item.getName());
