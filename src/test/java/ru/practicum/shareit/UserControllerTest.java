@@ -162,7 +162,8 @@ public class UserControllerTest {
                 .content(this.objectMapper.writeValueAsString(user));
     }
 
-    private @NotNull MockHttpServletRequestBuilder patchRequest(UserDto user, Long userId) throws JsonProcessingException {
+    private @NotNull MockHttpServletRequestBuilder patchRequest(UserDto user, Long userId)
+            throws JsonProcessingException {
         return MockMvcRequestBuilders.patch(url + "/" + userId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
