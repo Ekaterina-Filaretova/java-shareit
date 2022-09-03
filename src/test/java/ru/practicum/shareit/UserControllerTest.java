@@ -2,6 +2,7 @@ package ru.practicum.shareit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -47,8 +48,10 @@ public class UserControllerTest {
         mockMvc.perform(postRequest(user));
 
         UserDto user2 = new UserDto(null, "qwerty", "mail@qwerty.com");
-        mockMvc.perform(postRequest(user2))
-                .andExpect(status().isConflict());
+
+        Assertions.assertThatThrownBy(() ->
+                        mockMvc.perform(postRequest(user2)))
+                .hasCauseInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -115,7 +118,7 @@ public class UserControllerTest {
         UserDto user2 = new UserDto(1L, "qwerty", "mail@qwerty.com");
 
         mockMvc.perform(patchRequest(user2, user2.getId()))
-                .andExpect(status().isConflict());
+                .andExpect(status().isOk());
     }
 
     @Test
