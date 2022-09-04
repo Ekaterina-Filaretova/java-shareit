@@ -37,27 +37,27 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.fromDto(userDto);
         user.setId(userId);
         Optional<User> updatedUser = repository.findById(user.getId());
-        if (updatedUser.isPresent()) {
-            if (user.getName() != null) {
-                updatedUser.get().setName(user.getName());
-            }
-            if (user.getEmail() != null) {
-                updatedUser.get().setEmail(user.getEmail());
-            }
-            log.info("Обновлен пользователь {}", updatedUser);
-            return userMapper.toDto(repository.save(updatedUser.get()));
+        if (updatedUser.isEmpty()) {
+            throw new ObjectNotFoundException("Пользователь с id " + user.getId() + " не найден");
         }
-        throw new ObjectNotFoundException("Пользователь с id " + user.getId() + " не найден");
+        if (user.getName() != null) {
+            updatedUser.get().setName(user.getName());
+        }
+        if (user.getEmail() != null) {
+            updatedUser.get().setEmail(user.getEmail());
+        }
+        log.info("Обновлен пользователь {}", updatedUser);
+        return userMapper.toDto(repository.save(updatedUser.get()));
     }
 
     @Override
     public UserDto getUserById(Long userId) {
         Optional<User> user = repository.findById(userId);
-        if (user.isPresent()) {
-            log.info("Получен пользователь {}", user.get());
-            return userMapper.toDto(user.get());
+        if (user.isEmpty()) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
         }
-        throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
+        log.info("Получен пользователь {}", user.get());
+        return userMapper.toDto(user.get());
     }
 
     @Override
@@ -74,11 +74,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void removeUser(Long userId) {
         Optional<User> user = repository.findById(userId);
-        if (user.isPresent()) {
-            log.info("Удален пользователь {}", user.get());
-            repository.deleteById(userId);
-            return;
+        if (user.isEmpty()) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
         }
-        throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
+        log.info("Удален пользователь {}", user.get());
+        repository.deleteById(userId);
     }
 }

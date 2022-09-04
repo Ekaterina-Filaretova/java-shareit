@@ -40,21 +40,21 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentDto add(Long itemId, Long userId, CommentDto commentDto) {
-        if (userService.getUserById(userId) != null) {
-            if (itemService.getItemById(itemId) != null) {
-                if (bookingService.getByItemId(itemId, userId, LocalDateTime.now()) != null) {
-                    Comment comment = commentMapper.fromDto(commentDto);
-                    comment.setAuthor(userMapper.fromDto(userService.getUserById(userId)));
-                    comment.setItem(itemService.getItemById(itemId));
-                    comment.setCreated(LocalDateTime.now());
-                    log.info("Добавлен комментарий {}", comment);
-                    return commentMapper.toDto(repository.save(comment));
-                }
-                throw new ValidationException("Бронирование предмета с id " + itemId + " не найдено");
-            }
+        if (userService.getUserById(userId) == null) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        if (itemService.getItemById(itemId) == null) {
             throw new ObjectNotFoundException("Предмет с id " + itemId + " не найден");
         }
-        throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
+        if (bookingService.getByItemId(itemId, userId, LocalDateTime.now()) == null) {
+            throw new ValidationException("Бронирование предмета с id " + itemId + " не найдено");
+        }
+        Comment comment = commentMapper.fromDto(commentDto);
+        comment.setAuthor(userMapper.fromDto(userService.getUserById(userId)));
+        comment.setItem(itemService.getItemById(itemId));
+        comment.setCreated(LocalDateTime.now());
+        log.info("Добавлен комментарий {}", comment);
+        return commentMapper.toDto(repository.save(comment));
     }
 
     @Override

@@ -55,36 +55,36 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto makeApprove(Long ownerId, Long bookingId, boolean approved) {
         Optional<Booking> booking = repository.findById(bookingId);
-        if (booking.isPresent()) {
-            if (booking.get().getItem().getOwner().getId().equals(ownerId)) {
-                if (booking.get().getStatus().equals(BookingStatus.WAITING)) {
-                    if (approved) {
-                        booking.get().setStatus(BookingStatus.APPROVED);
-                    } else {
-                        booking.get().setStatus(BookingStatus.REJECTED);
-                    }
-                    log.info("Бронированию {} установлен новый статус {}", booking, booking.get().getStatus());
-                    return bookingMapper.toDto(repository.save(booking.get()));
-                }
-                throw new ValidationException("Изменить статус бронирования невозможно");
-            }
+        if (booking.isEmpty()) {
+            throw new ObjectNotFoundException("Бронирование с id " + bookingId + " не найдено");
+        }
+        if (!booking.get().getItem().getOwner().getId().equals(ownerId)) {
             throw new ObjectNotFoundException("Изменить статус бронирования может только владелец предмета");
         }
-        throw new ObjectNotFoundException("Бронирование с id " + bookingId + " не найдено");
+        if (!booking.get().getStatus().equals(BookingStatus.WAITING)) {
+            throw new ValidationException("Изменить статус бронирования невозможно");
+        }
+        if (approved) {
+            booking.get().setStatus(BookingStatus.APPROVED);
+        } else {
+            booking.get().setStatus(BookingStatus.REJECTED);
+        }
+        log.info("Бронированию {} установлен новый статус {}", booking, booking.get().getStatus());
+        return bookingMapper.toDto(repository.save(booking.get()));
     }
 
     @Override
     public BookingDto getById(Long userId, Long bookingId) {
         Optional<Booking> booking = repository.findById(bookingId);
-        if (booking.isPresent()) {
-            if (booking.get().getBooker().getId().equals(userId)
-                    || booking.get().getItem().getOwner().getId().equals(userId)) {
-                log.info("Получено бронирование {}", booking.get());
-                return bookingMapper.toDto(booking.get());
-            }
+        if (booking.isEmpty()) {
+            throw new ObjectNotFoundException("Бронирование с id " + bookingId + " не найдено");
+        }
+        if (!booking.get().getBooker().getId().equals(userId) &&
+                !booking.get().getItem().getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("Просмотреть бронирование может либо владелец вещи, либо автор аренды");
         }
-        throw new ObjectNotFoundException("Бронирование с id " + bookingId + " не найдено");
+        log.info("Получено бронирование {}", booking.get());
+        return bookingMapper.toDto(booking.get());
     }
 
     @Override
@@ -131,7 +131,7 @@ public class BookingServiceImpl implements BookingService {
                     bookings = bookingMapper.toDto(repository.findByItemOwnerId(ownerId, orderByDesc()));
                     break;
                 case CURRENT:
-                    bookings = bookingMapper.toDto(repository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfter(
+                    bookings = bookingMapper.toDto(repository.findByItemOwnerIdAndStartBeforeAndEndAfter(
                             ownerId, LocalDateTime.now(), LocalDateTime.now(), orderByDesc()));
                     break;
                 case PAST:

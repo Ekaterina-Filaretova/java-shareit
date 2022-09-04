@@ -40,10 +40,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     List<Booking> findByItemOwnerId(Long ownerId, Sort sort);
 
-    List<Booking> findByItemOwnerIdAndStartIsBeforeAndEndIsAfter(Long ownerId,
-                                                                 LocalDateTime before,
-                                                                 LocalDateTime after,
-                                                                 Sort sort);
+    @Query(name = request + "AND b.start_date < ?2 AND b.end_date > ?3",
+            nativeQuery = true)
+    List<Booking> findByItemOwnerIdAndStartBeforeAndEndAfter(Long ownerId,
+                                                             LocalDateTime before,
+                                                             LocalDateTime after,
+                                                             Sort sort);
 
     @Query(name = request + "AND (b.status LIKE 'WAITING' OR b.status LIKE 'APPROVED') " +
             "AND b.end_date < ?2 ",
