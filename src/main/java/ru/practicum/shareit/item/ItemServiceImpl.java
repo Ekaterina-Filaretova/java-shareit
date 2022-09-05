@@ -45,11 +45,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto addItem(ItemDto itemDto, Long userId) {
+        if (userService.getUserById(userId) == null) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
+        }
         Item item = itemMapper.fromDto(itemDto);
         item.getOwner().setId(userId);
-        if (userService.getUserById(userId) == null) {
-            throw new ObjectNotFoundException("Пользователь с id " + item.getOwner().getId() + " не найден");
-        }
         item.setOwner(userMapper.fromDto(userService.getUserById(item.getOwner().getId())));
         log.info("Добавлен предмет {}", item);
         return itemMapper.toDto(repository.save(item));
@@ -78,13 +78,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemWithBookingDto getItemById(Long userId, Long itemId) {
-        Optional<Item> item = repository.findById(itemId);
-        if (item.isEmpty()) {
-            throw new ObjectNotFoundException("Предмет с id " + itemId + " не найден");
-        }
-        ItemWithBookingDto itemDto = ownerItemMapper.toDto(item.get());
+        Item item = checkItem(itemId);
+        ItemWithBookingDto itemDto = ownerItemMapper.toDto(item);
         itemDto.setComments(commentService.getAllByItemId(itemId));
-        if (item.get().getOwner().getId().equals(userId)) {
+        if (item.getOwner().getId().equals(userId)) {
             itemDto.setLastBooking(bookingService.getLastBooking(itemId));
             itemDto.setNextBooking(bookingService.getNextBooking(itemId));
         }
@@ -113,16 +110,21 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item getItemById(Long itemId) {
-        Optional<Item> item = repository.findById(itemId);
-        if (item.isEmpty()) {
-            throw new ObjectNotFoundException("Предмет с id " + itemId + " не найден");
-        }
-        item.get().setOwner(userMapper.fromDto(userService.getUserById(item.get().getOwner().getId())));
-        return item.get();
+        Item item = checkItem(itemId);
+        item.setOwner(userMapper.fromDto(userService.getUserById(item.getOwner().getId())));
+        return item;
     }
 
     @Override
     public CommentDto addComment(Long itemId, Long userId, CommentDto commentDto) {
         return commentService.add(itemId, userId, commentDto);
+    }
+
+    private Item checkItem(Long itemId) {
+        Optional<Item> item = repository.findById(itemId);
+        if (item.isEmpty()) {
+            throw new ObjectNotFoundException("Предмет с id " + itemId + " не найден");
+        }
+        return item.get();
     }
 }

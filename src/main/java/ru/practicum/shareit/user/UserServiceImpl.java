@@ -34,30 +34,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto userDto, Long userId) {
+        User updatedUser = checkUser(userId);
         User user = userMapper.fromDto(userDto);
         user.setId(userId);
-        Optional<User> updatedUser = repository.findById(user.getId());
-        if (updatedUser.isEmpty()) {
-            throw new ObjectNotFoundException("Пользователь с id " + user.getId() + " не найден");
-        }
         if (user.getName() != null) {
-            updatedUser.get().setName(user.getName());
+            updatedUser.setName(user.getName());
         }
         if (user.getEmail() != null) {
-            updatedUser.get().setEmail(user.getEmail());
+            updatedUser.setEmail(user.getEmail());
         }
         log.info("Обновлен пользователь {}", updatedUser);
-        return userMapper.toDto(repository.save(updatedUser.get()));
+        return userMapper.toDto(repository.save(updatedUser));
     }
 
     @Override
     public UserDto getUserById(Long userId) {
-        Optional<User> user = repository.findById(userId);
-        if (user.isEmpty()) {
-            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
-        }
-        log.info("Получен пользователь {}", user.get());
-        return userMapper.toDto(user.get());
+        User user = checkUser(userId);
+        log.info("Получен пользователь {}", user);
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -79,5 +73,13 @@ public class UserServiceImpl implements UserService {
         }
         log.info("Удален пользователь {}", user.get());
         repository.deleteById(userId);
+    }
+
+    private User checkUser(Long userId) {
+        Optional<User> user = repository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ObjectNotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        return user.get();
     }
 }

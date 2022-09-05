@@ -39,58 +39,56 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto add(Long userId, BookingDto bookingDto) {
+        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
+            throw new ValidationException("Дата конца аренды не может быть раньше даты начала аренды");
+        }
         Booking booking = bookingMapper.fromDto(bookingDto);
         booking.setItem(itemService.getItemById(bookingDto.getItemId()));
         if (booking.getItem().getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("Владелец не может арендовать собственную вещь");
         }
-        booking.setBooker(userMapper.fromDto(userService.getUserById(userId)));
-        if (isDateValid(booking) && booking.getItem().getAvailable()) {
-            log.info("Добавлено бронирование {}", booking);
-            return bookingMapper.toDto(repository.save(booking));
+        if (!booking.getItem().getAvailable()) {
+            throw new ValidationException("Предмет " + booking.getItem() + " не доступен");
         }
-        throw new ValidationException("Предмет " + booking.getItem() + " не доступен");
+        booking.setBooker(userMapper.fromDto(userService.getUserById(userId)));
+        log.info("Добавлено бронирование {}", booking);
+        return bookingMapper.toDto(repository.save(booking));
     }
 
     @Override
     public BookingDto makeApprove(Long ownerId, Long bookingId, boolean approved) {
-        Optional<Booking> booking = repository.findById(bookingId);
-        if (booking.isEmpty()) {
-            throw new ObjectNotFoundException("Бронирование с id " + bookingId + " не найдено");
-        }
-        if (!booking.get().getItem().getOwner().getId().equals(ownerId)) {
+        Booking booking = checkBooking(bookingId);
+        if (!booking.getItem().getOwner().getId().equals(ownerId)) {
             throw new ObjectNotFoundException("Изменить статус бронирования может только владелец предмета");
         }
-        if (!booking.get().getStatus().equals(BookingStatus.WAITING)) {
+        if (!booking.getStatus().equals(BookingStatus.WAITING)) {
             throw new ValidationException("Изменить статус бронирования невозможно");
         }
         if (approved) {
-            booking.get().setStatus(BookingStatus.APPROVED);
+            booking.setStatus(BookingStatus.APPROVED);
         } else {
-            booking.get().setStatus(BookingStatus.REJECTED);
+            booking.setStatus(BookingStatus.REJECTED);
         }
-        log.info("Бронированию {} установлен новый статус {}", booking, booking.get().getStatus());
-        return bookingMapper.toDto(repository.save(booking.get()));
+        log.info("Бронированию {} установлен новый статус {}", booking, booking.getStatus());
+        return bookingMapper.toDto(repository.save(booking));
     }
 
     @Override
     public BookingDto getById(Long userId, Long bookingId) {
-        Optional<Booking> booking = repository.findById(bookingId);
-        if (booking.isEmpty()) {
-            throw new ObjectNotFoundException("Бронирование с id " + bookingId + " не найдено");
-        }
-        if (!booking.get().getBooker().getId().equals(userId) &&
-                !booking.get().getItem().getOwner().getId().equals(userId)) {
+        Booking booking = checkBooking(bookingId);
+        if (!booking.getBooker().getId().equals(userId) &&
+                !booking.getItem().getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("Просмотреть бронирование может либо владелец вещи, либо автор аренды");
         }
-        log.info("Получено бронирование {}", booking.get());
-        return bookingMapper.toDto(booking.get());
+        log.info("Получено бронирование {}", booking);
+        return bookingMapper.toDto(booking);
     }
 
     @Override
     public List<BookingDto> getByUserAndState(Long bookerId, String state) {
+        checkEnum(state);
         List<BookingDto> bookings = new ArrayList<>();
-        if (userService.getUserById(bookerId) != null && checkEnum(state)) {
+        if (userService.getUserById(bookerId) != null) {
             switch (BookingState.valueOf(state)) {
                 case ALL:
                     bookings = bookingMapper.toDto(repository.findByBookerId(bookerId, orderByDesc()));
@@ -122,10 +120,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getByOwnerAndState(Long ownerId, String state) {
+        checkEnum(state);
         List<BookingDto> bookings = new ArrayList<>();
         if (itemService.getItemsByOwner(ownerId).size() > 0 &&
-                userService.getUserById(ownerId) != null &&
-                checkEnum(state)) {
+                userService.getUserById(ownerId) != null) {
             switch (BookingState.valueOf(state)) {
                 case ALL:
                     bookings = bookingMapper.toDto(repository.findByItemOwnerId(ownerId, orderByDesc()));
@@ -173,23 +171,24 @@ public class BookingServiceImpl implements BookingService {
         return repository.findByItemIdAndBookerIdAndEndIsBefore(itemId, userId, time);
     }
 
-    private boolean isDateValid(Booking booking) {
-        if (booking.getEnd().isAfter(booking.getStart())) {
-            return true;
-        }
-        throw new ValidationException("Дата конца аренды не может быть раньше даты начала аренды");
-    }
-
     private Sort orderByDesc() {
         return Sort.by(Sort.Direction.DESC, "end");
     }
 
-    private boolean checkEnum(String string) {
+    private void checkEnum(String string) {
         for (BookingState state : BookingState.values()) {
             if (state.toString().equals(string)) {
-                return true;
+                return;
             }
         }
         throw new ValidationException("Unknown state: " + string);
+    }
+
+    private Booking checkBooking(Long bookingId) {
+        Optional<Booking> booking = repository.findById(bookingId);
+        if (booking.isEmpty()) {
+            throw new ObjectNotFoundException("Бронирование с id " + bookingId + " не найдено");
+        }
+        return booking.get();
     }
 }
