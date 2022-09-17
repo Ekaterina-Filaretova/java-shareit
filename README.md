@@ -1,2 +1,3 @@
 # java-shareit
-Template repository for Shareit project.
+
+![Диаграмма shareit](src/main/resources/java-shareit.png)

@@ -199,7 +199,8 @@ public class ItemControllerTest {
         ItemDto item = new ItemDto(null, "name", "desc", true, null);
         mockMvc.perform(postRequest(item, 1L));
 
-        mockMvc.perform(MockMvcRequestBuilders.get(url + "/1"))
+        mockMvc.perform(MockMvcRequestBuilders.get(url + "/1")
+                        .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("name")))
