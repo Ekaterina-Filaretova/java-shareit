@@ -2,7 +2,6 @@ package ru.practicum.shareit.requests;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
-import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ public class ItemRequestMapper {
     public ItemRequest convertFromDto(ItemRequestDto requestDto) {
         return new ItemRequest(requestDto.getId(),
                 requestDto.getDescription(),
-                new User(),
+                null,
                 requestDto.getCreated());
     }
 

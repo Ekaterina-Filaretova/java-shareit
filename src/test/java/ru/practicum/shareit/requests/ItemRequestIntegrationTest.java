@@ -61,7 +61,7 @@ public class ItemRequestIntegrationTest {
         Optional<ItemRequest> foundRequest = repository.findById(4L);
         assertThat(foundRequest).isNotEmpty();
         assertThat(foundRequest.get().getDescription()).isEqualTo(request.getDescription());
-        assertThat(foundRequest.get().getRequester().getId()).isEqualTo(2L);
+        assertThat(foundRequest.get().getRequesterId()).isEqualTo(2L);
         assertThat(foundRequest.get().getCreated()).isNotNull();
     }
 
@@ -92,7 +92,7 @@ public class ItemRequestIntegrationTest {
         Optional<ItemRequest> request = repository.findById(3L);
 
         assertThat(request).isNotEmpty();
-        assertThat(request.get().getRequester().getId()).isEqualTo(2L);
+        assertThat(request.get().getRequesterId()).isEqualTo(2L);
         assertThat(request.get().getDescription()).isEqualTo("text3");
     }
 

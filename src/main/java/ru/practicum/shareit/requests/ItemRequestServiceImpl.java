@@ -38,7 +38,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto add(Long userId, ItemRequestDto requestDto) {
         checkUser(userId);
         ItemRequest request = requestMapper.convertFromDto(requestDto);
-        request.getRequester().setId(userId);
+        request.setRequesterId(userId);
         request.setCreated(LocalDateTime.now());
         log.info("Добавлен запрос вещи {}", request);
         return requestMapper.convertToDto(repository.save(request));

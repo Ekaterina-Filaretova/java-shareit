@@ -38,7 +38,7 @@ public class ItemRepositoryTest {
     public void setUp() {
         User user = new User(null, "user", "qwe@mail.com");
         User user2 = new User(null, "user2", "asd@mail.com");
-        ItemRequest request = new ItemRequest(null, "desc", user2, LocalDateTime.now());
+        ItemRequest request = new ItemRequest(null, "desc", 2L, LocalDateTime.now());
         Item item = new Item(null, "item", "desc", true, user, request);
         Item item2 = new Item(null, "second item", "desc2", true, user, null);
         Item item3 = new Item(null, "third item", "desc3", true, user2, null);

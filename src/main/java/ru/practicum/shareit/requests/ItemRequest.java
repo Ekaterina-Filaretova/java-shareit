@@ -1,7 +1,6 @@
 package ru.practicum.shareit.requests;
 
 import lombok.*;
-import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,9 +20,8 @@ public class ItemRequest {
     private Long id;
     private String description;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "requester_id")
-    private User requester;
+    private Long requesterId;
 
     @Column(name = "create_date")
     private LocalDateTime created;

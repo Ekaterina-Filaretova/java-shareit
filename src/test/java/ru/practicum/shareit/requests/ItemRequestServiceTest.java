@@ -9,7 +9,6 @@ import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -44,7 +43,7 @@ public class ItemRequestServiceTest {
     @Test
     public void addRequest() {
         ItemRequestDto requestDto = new ItemRequestDto(1L, "text", LocalDateTime.now(), List.of());
-        ItemRequest request = new ItemRequest(1L, null, new User(), null);
+        ItemRequest request = new ItemRequest(1L, null, 1L, null);
         when(userService.getUserById(any())).thenReturn(new UserDto());
         when(requestMapper.convertFromDto(any())).thenReturn(request);
         when(repository.save(any())).thenReturn(request);
@@ -67,7 +66,7 @@ public class ItemRequestServiceTest {
     @Test
     public void getAllByRequester() {
         ItemRequestDto requestDto = new ItemRequestDto(1L, "text", LocalDateTime.now(), List.of());
-        ItemRequest request = new ItemRequest(1L, "text", new User(), LocalDateTime.now());
+        ItemRequest request = new ItemRequest(1L, "text", 1L, LocalDateTime.now());
         ItemDto item = new ItemDto(1L, "item", "desc", true, 1L);
         ItemDto item2 = new ItemDto(2L, "item2", "desc2", true, 1L);
         when(userService.getUserById(any())).thenReturn(new UserDto());
@@ -93,7 +92,7 @@ public class ItemRequestServiceTest {
     @Test
     public void getAllExceptRequester() {
         ItemRequestDto requestDto = new ItemRequestDto(1L, "text", LocalDateTime.now(), List.of());
-        ItemRequest request = new ItemRequest(1L, "text", new User(), LocalDateTime.now());
+        ItemRequest request = new ItemRequest(1L, "text", 2L, LocalDateTime.now());
         ItemDto item = new ItemDto(1L, "item", "desc", true, 1L);
         ItemDto item2 = new ItemDto(2L, "item2", "desc2", true, 1L);
         when(userService.getUserById(any())).thenReturn(new UserDto());

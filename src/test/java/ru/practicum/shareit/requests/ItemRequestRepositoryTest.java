@@ -37,9 +37,9 @@ public class ItemRequestRepositoryTest {
     public void setUp() {
         User requester = new User(null, "requester", "qwe@mail.com");
         User requester2 = new User(null, "requester2", "asd@mail.com");
-        ItemRequest request = new ItemRequest(null, "text", requester, LocalDateTime.now());
-        ItemRequest request2 = new ItemRequest(null, "text2", requester2, LocalDateTime.now());
-        ItemRequest request3 = new ItemRequest(null, "text3", requester2, LocalDateTime.now());
+        ItemRequest request = new ItemRequest(null, "text", 1L, LocalDateTime.now());
+        ItemRequest request2 = new ItemRequest(null, "text2", 2L, LocalDateTime.now());
+        ItemRequest request3 = new ItemRequest(null, "text3", 2L, LocalDateTime.now());
         manager.persist(requester);
         manager.persist(requester2);
         manager.persist(request);
