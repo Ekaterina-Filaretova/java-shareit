@@ -14,11 +14,13 @@ public interface ItemService {
 
     ItemWithBookingDto getItemById(Long userId, Long itemId);
 
-    List<ItemWithBookingDto> getItemsByOwner(Long ownerId);
+    List<ItemWithBookingDto> getItemsByOwner(Long ownerId, Integer from, Integer size);
 
-    List<ItemDto> getItemsBySearch(String text);
+    List<ItemDto> getItemsBySearch(String text, Integer from, Integer size);
 
     Item getItemById(Long itemId);
 
     CommentDto addComment(Long itemId, Long userId, CommentDto commentDto);
+
+    List<ItemDto> getAllByRequestId(Long requestId);
 }

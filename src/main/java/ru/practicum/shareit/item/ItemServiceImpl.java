@@ -2,6 +2,8 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
@@ -10,6 +12,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.utils.OffsetPageRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +60,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(ItemDto itemDto, Long userId, Long itemId) {
-        for (Item ownerItem : repository.findByOwnerIdOrderByIdAsc(userId)) {
+        for (Item ownerItem : repository.findByOwnerId(userId, Pageable.unpaged())) {
             if (ownerItem.getId().equals(itemId)) {
                 Item updatedItem = getItemById(itemId);
                 if (itemDto.getName() != null) {
@@ -90,8 +93,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithBookingDto> getItemsByOwner(Long ownerId) {
-        List<ItemWithBookingDto> items = ownerItemMapper.toDto(repository.findByOwnerIdOrderByIdAsc(ownerId));
+    public List<ItemWithBookingDto> getItemsByOwner(Long ownerId, Integer from, Integer size) {
+        List<ItemWithBookingDto> items = ownerItemMapper.toDto(repository.findByOwnerId(ownerId,
+                getPagination(from, size)));
         for (ItemWithBookingDto item : items) {
             item.setLastBooking(bookingService.getLastBooking(item.getId()));
             item.setNextBooking(bookingService.getNextBooking(item.getId()));
@@ -101,9 +105,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsBySearch(String text) {
+    public List<ItemDto> getItemsBySearch(String text, Integer from, Integer size) {
         text = text.toLowerCase().trim();
-        List<Item> items = text.isEmpty() ? new ArrayList<>() : repository.findByText(text);
+        List<Item> items = text.isEmpty() ? new ArrayList<>() :
+                repository.findByText(text, getPagination(from, size));
         log.info("Получен список предметов {} по поиску {}", items, text);
         return itemMapper.toDto(items);
     }
@@ -120,11 +125,22 @@ public class ItemServiceImpl implements ItemService {
         return commentService.add(itemId, userId, commentDto);
     }
 
+    @Override
+    public List<ItemDto> getAllByRequestId(Long requestId) {
+        List<Item> items = repository.getAllByRequestId(requestId);
+        log.info("Получен список предметов {} по запросу {}", items, requestId);
+        return items == null ? new ArrayList<>() : itemMapper.toDto(items);
+    }
+
     private Item checkItem(Long itemId) {
         Optional<Item> item = repository.findById(itemId);
         if (item.isEmpty()) {
             throw new ObjectNotFoundException("Предмет с id " + itemId + " не найден");
         }
         return item.get();
+    }
+
+    private Pageable getPagination(Integer from, Integer size) {
+        return new OffsetPageRequest(from, size, Sort.by(Sort.Direction.ASC, "item_id"));
     }
 }
