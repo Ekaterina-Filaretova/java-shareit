@@ -154,8 +154,8 @@ public class UserControllerTest {
     public void getAll() throws Exception {
         UserDto user = new UserDto(1L, "user", "qwe@mail.com");
         UserDto user2 = new UserDto(2L, "new user", "asd@mail.com");
-        when(client.getAllUsers()).
-                thenReturn(new ResponseEntity<>(List.of(user, user2), HttpStatus.OK));
+        when(client.getAllUsers())
+                .thenReturn(new ResponseEntity<>(List.of(user, user2), HttpStatus.OK));
 
         mockMvc.perform(MockMvcRequestBuilders.get(url))
                 .andExpect(status().isOk())

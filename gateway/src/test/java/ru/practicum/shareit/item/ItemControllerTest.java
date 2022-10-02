@@ -248,8 +248,8 @@ public class ItemControllerTest {
     public void getItemsBySearch() throws Exception {
         ItemDto itemDto = new ItemDto(1L, "item", "desc", true, null);
         ItemDto itemDto2 = new ItemDto(2L, "new item", "new desc", false, null);
-        when(client.getItemsBySearch(any(), any(), any(), any())).
-                thenReturn(new ResponseEntity<>(List.of(itemDto, itemDto2), HttpStatus.OK));
+        when(client.getItemsBySearch(any(), any(), any(), any()))
+                .thenReturn(new ResponseEntity<>(List.of(itemDto, itemDto2), HttpStatus.OK));
 
         mockMvc.perform(MockMvcRequestBuilders.get(url + "/search")
                         .header("X-Sharer-User-Id", 1L)
@@ -336,8 +336,8 @@ public class ItemControllerTest {
         CommentDto comment2 = new CommentDto(2L, "comment", "new name", null);
         ItemWithBookingDto itemDto = new ItemWithBookingDto(1L, "item", "desc", true,
                 null, null, List.of(comment, comment2), null);
-        when(client.getItemById(any(), any())).
-                thenReturn(new ResponseEntity<>(itemDto, HttpStatus.OK));
+        when(client.getItemById(any(), any()))
+                .thenReturn(new ResponseEntity<>(itemDto, HttpStatus.OK));
 
         mockMvc.perform(MockMvcRequestBuilders.get(url + "/" + itemDto.getId())
                         .header("X-Sharer-User-Id", 1L))
@@ -361,8 +361,8 @@ public class ItemControllerTest {
                 null, null, List.of(comment, comment2), null);
         ItemWithBookingDto itemDto2 = new ItemWithBookingDto(2L, "item", "desc", true,
                 null, null, List.of(), null);
-        when(client.getItemsByOwner(any(), any(), any())).
-                thenReturn(new ResponseEntity<>(List.of(itemDto, itemDto2), HttpStatus.OK));
+        when(client.getItemsByOwner(any(), any(), any()))
+                .thenReturn(new ResponseEntity<>(List.of(itemDto, itemDto2), HttpStatus.OK));
 
         mockMvc.perform(MockMvcRequestBuilders.get(url)
                         .header("X-Sharer-User-Id", 1L))
@@ -425,8 +425,8 @@ public class ItemControllerTest {
                 lastBooking, nextBooking, List.of(), null);
         ItemWithBookingDto itemDto2 = new ItemWithBookingDto(2L, "new item", "new desc", true,
                 null, null, List.of(), null);
-        when(client.getItemsByOwner(any(), any(), any())).
-                thenReturn(new ResponseEntity<>(List.of(itemDto, itemDto2), HttpStatus.OK));
+        when(client.getItemsByOwner(any(), any(), any()))
+                .thenReturn(new ResponseEntity<>(List.of(itemDto, itemDto2), HttpStatus.OK));
 
         mockMvc.perform(MockMvcRequestBuilders.get(url)
                         .header("X-Sharer-User-Id", 1L))

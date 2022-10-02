@@ -82,8 +82,8 @@ public class ItemRequestControllerTest {
 
     @Test
     public void getAllByRequester() throws Exception {
-        when(client.getAllByRequester(any())).
-                thenReturn(new ResponseEntity<>(List.of(new ItemRequestDto(), new ItemRequestDto()), HttpStatus.OK));
+        when(client.getAllByRequester(any()))
+                .thenReturn(new ResponseEntity<>(List.of(new ItemRequestDto(), new ItemRequestDto()), HttpStatus.OK));
 
         mockMvc.perform(MockMvcRequestBuilders.get(url)
                         .header("X-Sharer-User-Id", 1L))
