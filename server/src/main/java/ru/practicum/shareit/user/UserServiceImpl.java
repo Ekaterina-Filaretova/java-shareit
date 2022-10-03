@@ -3,7 +3,6 @@ package ru.practicum.shareit.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.ArrayList;
@@ -25,9 +24,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(UserDto userDto) {
         User user = userMapper.fromDto(userDto);
-        if (user.getEmail() == null || user.getEmail().isBlank() || user.getEmail().isEmpty()) {
-            throw new ValidationException("Почта не должна быть пустой");
-        }
         log.info("Добавлен пользователь {}", user);
         return userMapper.toDto(repository.save(user));
     }

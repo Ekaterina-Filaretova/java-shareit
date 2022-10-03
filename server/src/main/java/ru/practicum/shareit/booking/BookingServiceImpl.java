@@ -41,9 +41,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto add(Long userId, BookingDto bookingDto) {
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new ValidationException("Дата конца аренды не может быть раньше даты начала аренды");
-        }
         Booking booking = bookingMapper.fromDto(bookingDto);
         booking.setItem(itemService.getItemById(bookingDto.getItemId()));
         if (booking.getItem().getOwner().getId().equals(userId)) {

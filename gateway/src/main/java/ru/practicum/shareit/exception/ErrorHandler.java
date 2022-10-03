@@ -26,4 +26,9 @@ public class ErrorHandler extends DefaultResponseErrorHandler {
     public ResponseEntity<String> handleConstraintViolationException(final ConstraintViolationException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleValidationException(final ValidationException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.requests;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +15,11 @@ import java.util.List;
 @Validated
 public class ItemRequestController {
 
-    @Autowired
-    private ItemRequestClient client;
+    private final ItemRequestClient client;
+
+    public ItemRequestController(ItemRequestClient client) {
+        this.client = client;
+    }
 
     @PostMapping
     public ResponseEntity<ItemRequestDto> add(@RequestHeader("X-Sharer-User-Id") Long requesterId,

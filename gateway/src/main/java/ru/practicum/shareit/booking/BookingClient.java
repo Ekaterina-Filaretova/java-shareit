@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.exception.ErrorHandler;
+import ru.practicum.shareit.exception.ValidationException;
 
 import java.util.List;
 
@@ -25,6 +26,9 @@ public class BookingClient {
     }
 
     public ResponseEntity<BookingDto> add(Long userId, BookingDto bookingDto) {
+        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
+            throw new ValidationException("Дата конца аренды не может быть раньше даты начала аренды");
+        }
         return template.postForEntity("",
                 getHttpEntity(userId, bookingDto),
                 BookingDto.class);

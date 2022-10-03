@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +15,11 @@ import java.util.List;
 @Validated
 public class BookingController {
 
-    @Autowired
-    private BookingClient client;
+    private final BookingClient client;
+
+    public BookingController(BookingClient client) {
+        this.client = client;
+    }
 
     @PostMapping
     public ResponseEntity<BookingDto> add(@RequestHeader("X-Sharer-User-Id") Long userId,

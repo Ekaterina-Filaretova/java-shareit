@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -12,8 +11,11 @@ import java.util.List;
 @RequestMapping(path = "/users")
 public class UserController {
 
-    @Autowired
-    private UserClient client;
+    private final UserClient client;
+
+    public UserController(UserClient client) {
+        this.client = client;
+    }
 
     @PostMapping
     public ResponseEntity<UserDto> addUser(@Valid @RequestBody UserDto userDto) {

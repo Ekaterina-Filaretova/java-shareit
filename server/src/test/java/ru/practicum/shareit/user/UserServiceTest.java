@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
@@ -40,33 +39,6 @@ public class UserServiceTest {
 
         UserDto savedUser = userService.addUser(userDto);
         assertThat(savedUser).usingRecursiveComparison().isEqualTo(userDto);
-    }
-
-    @Test
-    public void addUserWithoutMail() {
-        User userDto = new User(1L, "user", null);
-        when(mapper.fromDto(any())).thenReturn(userDto);
-
-        assertThatThrownBy(() -> userService.addUser(new UserDto()))
-                .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
-    public void addUserWithEmptyMail() {
-        User userDto = new User(1L, "user", "");
-        when(mapper.fromDto(any())).thenReturn(userDto);
-
-        assertThatThrownBy(() -> userService.addUser(new UserDto()))
-                .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
-    public void addUserWithBlankMail() {
-        User userDto = new User(1L, "user", "   ");
-        when(mapper.fromDto(any())).thenReturn(userDto);
-
-        assertThatThrownBy(() -> userService.addUser(new UserDto()))
-                .isInstanceOf(ValidationException.class);
     }
 
     @Test

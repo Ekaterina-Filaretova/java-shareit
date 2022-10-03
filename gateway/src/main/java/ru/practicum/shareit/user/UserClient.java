@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.exception.ErrorHandler;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
@@ -24,6 +25,9 @@ public class UserClient {
     }
 
     public ResponseEntity<UserDto> addUser(UserDto userDto) {
+        if (userDto.getEmail() == null || userDto.getEmail().isBlank() || userDto.getEmail().isEmpty()) {
+            throw new ValidationException("Почта не должна быть пустой");
+        }
         return template.postForEntity("",
                 getHttpEntity(userDto),
                 UserDto.class);

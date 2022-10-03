@@ -68,16 +68,6 @@ public class BookingServiceTest {
     }
 
     @Test
-    public void addBookingWithEndBeforeStart() {
-        BookingDto bookingDto = new BookingDto(1L, getLTD(6), getLTD(4),
-                null, 1L, null, null, null);
-
-        assertThatThrownBy(() ->
-                bookingService.add(1L, bookingDto))
-                .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
     public void addBookingWithoutItemExist() {
         BookingDto bookingDto = new BookingDto(1L, getLTD(2), getLTD(3),
                 null, 1L, null, null, null);
