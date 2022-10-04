@@ -1,3 +1,3 @@
 # java-shareit
 
-![Диаграмма shareit](src/main/resources/java-shareit.png)
+![Диаграмма shareit](server/src/main/resources/java-shareit.png)
