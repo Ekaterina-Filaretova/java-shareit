@@ -26,9 +26,7 @@ public class BookingClient {
     }
 
     public ResponseEntity<BookingDto> add(Long userId, BookingDto bookingDto) {
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new ValidationException("Дата конца аренды не может быть раньше даты начала аренды");
-        }
+        checkDate(bookingDto);
         return template.postForEntity("",
                 getHttpEntity(userId, bookingDto),
                 BookingDto.class);
@@ -73,5 +71,11 @@ public class BookingClient {
         headers.set("X-Sharer-User-Id", String.valueOf(userId));
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return bookingDto == null ? new HttpEntity<>(headers) : new HttpEntity<>(bookingDto, headers);
+    }
+
+    private void checkDate(BookingDto bookingDto) {
+        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
+            throw new ValidationException("Дата конца аренды не может быть раньше даты начала аренды");
+        }
     }
 }

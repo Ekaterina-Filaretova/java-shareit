@@ -25,9 +25,7 @@ public class UserClient {
     }
 
     public ResponseEntity<UserDto> addUser(UserDto userDto) {
-        if (userDto.getEmail() == null || userDto.getEmail().isBlank() || userDto.getEmail().isEmpty()) {
-            throw new ValidationException("Почта не должна быть пустой");
-        }
+        checkEmail(userDto.getEmail());
         return template.postForEntity("",
                 getHttpEntity(userDto),
                 UserDto.class);
@@ -64,5 +62,11 @@ public class UserClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return userDto == null ? new HttpEntity<>(headers) : new HttpEntity<>(userDto, headers);
+    }
+
+    private void checkEmail(String email) {
+        if (email == null || email.isBlank() || email.isEmpty()) {
+            throw new ValidationException("Почта не должна быть пустой");
+        }
     }
 }
